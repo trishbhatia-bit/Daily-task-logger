@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Task Logger</title>
+  <style>
+    /* 1. Base Styles & Typography */
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #F9FAFB; /* Soft light gray */
+      color: #1F2937; /* Dark slate text */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 1rem;
+      box-sizing: border-box;
+    }
+
+    /* 2. The Form Container (White Card) */
+    .card {
+      background-color: #FFFFFF;
+      width: 100%;
+      max-width: 450px;
+      padding: 2.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    h2 {
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    /* 3. Layout Classes */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .grid-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    /* 4. Inputs & Labels */
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: #374151;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    textarea {
+      width: 100%;
+      padding: 0.625rem 0.75rem;
+      border: 1px solid #D1D5DB;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-family: inherit;
+      font-size: 0.875rem;
+      transition: all 0.2s ease;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    /* Focus States (Muted Indigo Glow) */
+    input:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #4F46E5;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    /* 5. The Submit Button */
+    button {
+      width: 100%;
+      background-color: #4F46E5; /* Muted Indigo */
+      color: #FFFFFF;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      margin-top: 0.5rem;
+    }
+
+    button:hover {
+      background-color: #4338CA; /* Darker Indigo on hover */
+    }
+
+    button:disabled {
+      background-color: #A5B4FC; /* Faded Indigo when saving */
+      cursor: not-allowed;
+    }
+
+    /* 6. Status Message Banner */
+    #statusMessage {
+      margin-top: 1rem;
+      padding: 0.75rem;
+      border-radius: 6px;
+      text-align: center;
+      font-size: 0.875rem;
+      font-weight: 500;
+      display: none; /* Hidden by default */
+    }
+
+    .success {
+      background-color: #D1FAE5;
+      color: #065F46;
+      border: 1px solid #34D399;
+    }
+
+    .error {
+      background-color: #FEE2E2;
+      color: #991B1B;
+      border: 1px solid #F87171;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h2>Daily Task Logger</h2>
+    
+    <form id="taskForm">
+      <div class="grid-row">
+        <div class="form-group">
+          <label for="date">Date</label>
+          <input type="date" id="date" required>
+        </div>
+        <div class="form-group">
+          <label for="day">Day</label>
+          <input type="text" id="day" placeholder="Day 1" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="category">Category</label>
+        <input type="text" id="category" placeholder="Meetings, Development, etc." required>
+      </div>
+
+      <div class="form-group">
+        <label for="task">Task Description</label>
+        <textarea id="task" placeholder="Describe the work done..." required></textarea>
+      </div>
+
+      <button type="submit" id="submitBtn">Log Task</button>
+    </form>
+
+    <div id="statusMessage"></div>
+  </div>
+
+  <script>
+    // Set today's date automatically in the date picker as a convenience, 
+    // but the user can still change it.
+    document.getElementById('date').valueAsDate = new Date();
+
+    const form = document.getElementById('taskForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const statusMessage = document.getElementById('statusMessage');
+
+    // Intercept the default form submission
+    form.addEventListener('submit', function(e) {
+      e.preventDefault(); // Prevents the page from reloading
+
+      // 1. Update UI to "Saving" state
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Saving...';
+      statusMessage.style.display = 'none'; // Hide any previous messages
+
+      // 2. Gather the data from the inputs
+      const formData = {
+        date: document.getElementById('date').value,
+        day: document.getElementById('day').value,
+        category: document.getElementById('category').value,
+        task: document.getElementById('task').value
+      };
+
+      // 3. Send data to the backend (Code.gs)
+      google.script.run
+        .withSuccessHandler(onSuccess)
+        .withFailureHandler(onError)
+        .logTask(formData); // This calls the logTask function we will build next
+    });
+
+    // 4. Handle a successful save
+    function onSuccess(response) {
+      // Reset the button
+      submitBtn.disabled = false;
+      submitBtn.innerText = 'Log Task';
+
+      // The "Smart Reset": Clear category and task, but keep date and day
+      document.getElementById('category').value = '';
+      document.getElementById('task').value = '';
+
+      // Show success banner
+      statusMessage.innerText = 'Task logged successfully!';
+      statusMessage.className = 'success';
+      statusMessage.style.display = 'block';
+
+      // Hide the banner after 3 seconds
+      setTimeout(() => {
+        statusMessage.style.display = 'none';
+      }, 3000);
+    }
+
+    // 5. Handle any errors from the backend
+    function onError(error) {
+      // Reset the button
+      submitBtn.disabled = false;
+      submitBtn.innerText = 'Log Task';
+
+      // Show error banner
+      statusMessage.innerText = 'Error: Could not save task. Please try again.';
+      statusMessage.className = 'error';
+      statusMessage.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
