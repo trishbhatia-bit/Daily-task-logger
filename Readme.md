@@ -35,13 +35,10 @@ A full-stack automation solution built with **Google Apps Script** and **Gemini 
 
 ---
 
-## Setup & Installation
+## System Preview
 
-1.  Create a new Google Apps Script project at [script.google.com](https://script.google.com).
-2.  Copy the contents of `Code.gs`, `WeeklySummary.gs`, and `Index.html` into your project.
-3.  Replace the `SpreadsheetApp.openById` strings with your specific **Google Sheet ID**.
-4.  Navigate to **Project Settings > Script Properties** and add your `GEMINI_API_KEY`.
-5.  Deploy as a **Web App** (Execute as: Me | Who has access: Anyone within the organization).
-6.  Set up two **Triggers**:
+| User Interface | Automated Sheet log | AI Weekly Summary |
+| :---: | :---: | :---: |
+| ![Form UI](Webapp.png) | ![Sheet log](Sheet.png) | ![Weekly AI](AI%20generated%20summary.png) |
     * `generateDailyDigests`: Time-driven | Day timer | 11pm to Midnight.
     * `compileWeeklySummaries`: Time-driven | Week timer | Saturday | 11pm to Midnight.
