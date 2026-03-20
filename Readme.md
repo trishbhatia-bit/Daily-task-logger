@@ -39,6 +39,4 @@ A full-stack automation solution built with **Google Apps Script** and **Gemini 
 
 | User Interface | Automated Sheet log | AI Weekly Summary |
 | :---: | :---: | :---: |
-| ![Form UI](Webapp.png) | ![Sheet log](Sheet.png) | ![Weekly AI](AI%20generated%20summary.png) |
-    * `generateDailyDigests`: Time-driven | Day timer | 11pm to Midnight.
-    * `compileWeeklySummaries`: Time-driven | Week timer | Saturday | 11pm to Midnight.
+| ![Form UI](Webapp.png) | ![Sheet log](Sheet.png) | ![Weekly AI](AI%20generated%20summary%20doc.png) |
