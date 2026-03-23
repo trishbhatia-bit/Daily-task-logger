@@ -117,7 +117,19 @@ function generateDailyDigests() {
 
     // Permissions
     const targetEmail = user; 
-    docFile.addEditor(targetEmail, {sendNotificationEmail: false});
+    
+    // Use Advanced Drive API to grant edit access silently
+    Drive.Permissions.create(
+      {
+        role: 'writer',
+        type: 'user',
+        emailAddress: targetEmail
+      },
+      doc.getId(),
+      {
+        sendNotificationEmail: false
+      }
+    );
 
     // Extract First Name for greeting
     const firstNameRaw = targetEmail.split('@')[0].split('.')[0];

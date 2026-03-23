@@ -102,7 +102,19 @@ function compileWeeklySummaries() {
     docFile.moveTo(archiveFolder);
     
     const targetEmail = user;
-    docFile.addEditor(targetEmail, {sendNotificationEmail: false});
+    
+    // Use Advanced Drive API to grant edit access silently
+    Drive.Permissions.create(
+      {
+        role: 'writer',
+        type: 'user',
+        emailAddress: targetEmail
+      },
+      doc.getId(),
+      {
+        sendNotificationEmail: false
+      }
+    );  
 
     // 5. Send the Email with no-reply
     const docUrl = doc.getUrl();
